@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#572C57">
+    <title>Log75 - 75 Day Challenge</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Global Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Global Error Banner -->
+    <div id="error-banner" class="error-banner hidden"></div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- App Container -->
+    <div id="app">
+        <!-- PIN Gate Screen -->
+        <div id="pin-screen" class="screen hidden">
+            <div class="pin-container">
+                <div class="app-logo">
+                    <h1>Log75</h1>
+                    <p>75 Day Challenge Tracker</p>
+                </div>
+                <div class="pin-form">
+                    <input 
+                        type="password" 
+                        id="pin-input" 
+                        class="pin-input" 
+                        placeholder="Enter PIN"
+                        autocomplete="off"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                    >
+                    <button id="pin-submit" class="btn-primary">Unlock</button>
+                    <p id="pin-error" class="error-text hidden"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profiles Screen -->
+        <div id="profiles-screen" class="screen hidden">
+            <div class="screen-header">
+                <h2>Profiles</h2>
+                <button id="logout-btn" class="icon-btn" title="Lock">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="profiles-content">
+                <div id="profiles-list" class="profiles-list"></div>
+                <button id="create-profile-btn" class="btn-primary">+ Create New Profile</button>
+            </div>
+        </div>
+
+        <!-- Profile Detail Screen -->
+        <div id="profile-screen" class="screen hidden">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <button id="back-btn" class="icon-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                <h2 id="profile-name">Profile</h2>
+                <button id="lock-btn" class="icon-btn" title="Lock">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="profile-content">
+                <!-- Stats Card -->
+                <div id="stats-card" class="stats-card">
+                    <div class="stat-item">
+                        <div class="stat-value" id="completion-rate">--</div>
+                        <div class="stat-label">Completion</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="current-streak">--</div>
+                        <div class="stat-label">Current Streak</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="longest-streak">--</div>
+                        <div class="stat-label">Longest Streak</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="today-completion">--</div>
+                        <div class="stat-label">Today</div>
+                    </div>
+                </div>
+
+                <!-- Create Today Button -->
+                <div id="create-today-container" class="create-today-container hidden">
+                    <button id="create-today-btn" class="btn-primary">Create Today's Entry</button>
+                </div>
+
+                <!-- Days List -->
+                <div id="days-list" class="days-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
