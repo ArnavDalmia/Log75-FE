@@ -147,12 +147,11 @@ const API = (() => {
         // ============ DAYS ============
 
         /**
-         * Get days for profile
+         * Get unlocked days for profile
          * GET /api/v1/profiles/{profile_name}/days
          */
-        getDays: async (profileName, params = {}) => {
-            const queryString = new URLSearchParams(params).toString();
-            const url = getUrl(`/${encodeURIComponent(profileName)}/days${queryString ? '?' + queryString : ''}`);
+        getDays: async (profileName) => {
+            const url = getUrl(`/${encodeURIComponent(profileName)}/days`);
             return await fetchAPI(url);
         },
 
@@ -166,27 +165,24 @@ const API = (() => {
         },
 
         /**
-         * Get today's data
-         * GET /api/v1/profiles/{profile_name}/today
+         * Get current day data
+         * GET /api/v1/profiles/{profile_name}/current-day
          */
-        getToday: async (profileName) => {
-            const url = getUrl(`/${encodeURIComponent(profileName)}/today`);
+        getCurrentDay: async (profileName) => {
+            const url = getUrl(`/${encodeURIComponent(profileName)}/current-day`);
             return await fetchAPI(url);
         },
 
         /**
-         * Create today's entry
-         * POST /api/v1/profiles/{profile_name}/today
+         * Get progression status
+         * GET /api/v1/profiles/{profile_name}/progression-status
          */
-        createToday: async (profileName) => {
-            const url = getUrl(`/${encodeURIComponent(profileName)}/today`);
-            const headers = getHeaders(true);
-            return await fetchAPI(url, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify({})
-            });
+        getProgressionStatus: async (profileName) => {
+            const url = getUrl(`/${encodeURIComponent(profileName)}/progression-status`);
+            return await fetchAPI(url);
         },
+
+
 
         /**
          * Partial update (single field)

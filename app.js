@@ -39,8 +39,6 @@
         currentStreak: document.getElementById('current-streak'),
         longestStreak: document.getElementById('longest-streak'),
         todayCompletion: document.getElementById('today-completion'),
-        createTodayContainer: document.getElementById('create-today-container'),
-        createTodayBtn: document.getElementById('create-today-btn'),
         daysList: document.getElementById('days-list'),
 
         // Global
@@ -260,20 +258,21 @@
         elements.profileName.textContent = profileName;
 
         try {
-            // Load stats and days in parallel
-            const [stats, days, todayData] = await Promise.all([
+            // Load stats, current day, progression status and unlocked days in parallel
+            const [stats, currentDay, progressionStatus, days] = await Promise.all([
                 API.getStats(profileName),
-                API.getDays(profileName, { limit: 75 }),
-                API.getToday(profileName)
+                API.getCurrentDay(profileName),
+                API.getProgressionStatus(profileName),
+                API.getDays(profileName)
             ]);
 
             state.stats = stats;
+            state.currentDay = currentDay;
+            state.progressionStatus = progressionStatus;
             state.days = days;
-            state.today = todayData;
 
             renderStats();
             renderDays();
-            renderTodayButton();
         } catch (error) {
             console.error('Failed to load profile data:', error);
             showError('Failed to load profile data');
@@ -296,13 +295,7 @@
             : '--';
     }
 
-    function renderTodayButton() {
-        if (state.today && !state.today.exists) {
-            elements.createTodayContainer.classList.remove('hidden');
-        } else {
-            elements.createTodayContainer.classList.add('hidden');
-        }
-    }
+
 
     function renderDays() {
         elements.daysList.innerHTML = '';
@@ -312,21 +305,29 @@
             return;
         }
 
-        const todayDate = getTodayDateString();
+        // Get current day number from progression status or current day
+        const currentDayNumber = state.currentDay ? state.currentDay.day_count : 
+                                (state.progressionStatus ? state.progressionStatus.current_day : null);
 
-        // Sort days in reverse order (most recent first)
-        const sortedDays = [...state.days].sort((a, b) => b.day_count - a.day_count);
+        // Sort days: current day first, then past days in reverse order
+        const sortedDays = [...state.days].sort((a, b) => {
+            // Current day goes first
+            if (a.day_count === currentDayNumber) return -1;
+            if (b.day_count === currentDayNumber) return 1;
+            // Then sort remaining in descending order
+            return b.day_count - a.day_count;
+        });
 
         sortedDays.forEach(day => {
-            const isToday = day.date === todayDate;
-            const card = createDayCard(day, isToday);
+            const isCurrentDay = day.day_count === currentDayNumber;
+            const card = createDayCard(day, isCurrentDay);
             elements.daysList.appendChild(card);
         });
     }
 
-    function createDayCard(day, isToday = false) {
+    function createDayCard(day, isCurrentDay = false) {
         const card = document.createElement('div');
-        card.className = `day-card${isToday ? ' today' : ''}`;
+        card.className = `day-card${isCurrentDay ? ' current-day' : ''}`;
         card.dataset.dayCount = day.day_count;
 
         card.innerHTML = `
@@ -395,23 +396,7 @@
         }
     }
 
-    async function handleCreateToday() {
-        if (!state.activeProfile) return;
 
-        showLoading();
-        try {
-            await API.createToday(state.activeProfile);
-            showToast('Today\'s entry created!');
-            
-            // Reload profile data
-            await loadProfileData(state.activeProfile);
-        } catch (error) {
-            console.error('Failed to create today:', error);
-            showToast('Failed to create today\'s entry', true);
-        } finally {
-            hideLoading();
-        }
-    }
 
     // ============ ROUTING ============
 
@@ -462,7 +447,6 @@
             window.location.hash = '#/profiles';
         });
         elements.lockBtn.addEventListener('click', handleLogout);
-        elements.createTodayBtn.addEventListener('click', handleCreateToday);
 
         // Hash change for routing
         window.addEventListener('hashchange', handleRoute);

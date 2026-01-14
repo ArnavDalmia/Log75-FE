@@ -393,15 +393,6 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Create Today */
-.create-today-container {
-    margin-bottom: 16px;
-}
-
-.create-today-container.hidden {
-    display: none;
-}
-
 /* Days List */
 .days-list {
     display: flex;
@@ -417,7 +408,7 @@ body {
     transition: transform 0.2s;
 }
 
-.day-card.today {
+.day-card.current-day {
     background: var(--highlight);
     box-shadow: 0 4px 12px rgba(246, 234, 152, 0.5);
 }
