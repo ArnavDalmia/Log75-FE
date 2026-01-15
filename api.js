@@ -182,6 +182,29 @@ const API = (() => {
             return await fetchAPI(url);
         },
 
+        /**
+         * Check if profile can advance to next day
+         * GET /api/v1/profiles/{profile_name}/can-advance
+         */
+        canAdvance: async (profileName) => {
+            const url = getUrl(`/${encodeURIComponent(profileName)}/can-advance`);
+            return await fetchAPI(url);
+        },
+
+        /**
+         * Advance profile to next day
+         * POST /api/v1/profiles/{profile_name}/advance-day
+         */
+        advanceDay: async (profileName) => {
+            const url = getUrl(`/${encodeURIComponent(profileName)}/advance-day`);
+            const headers = getHeaders(true);
+            return await fetchAPI(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({})
+            });
+        },
+
 
 
         /**

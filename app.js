@@ -39,6 +39,7 @@
         currentStreak: document.getElementById('current-streak'),
         longestStreak: document.getElementById('longest-streak'),
         todayCompletion: document.getElementById('today-completion'),
+        refreshBtn: document.getElementById('refresh-btn'),
         daysList: document.getElementById('days-list'),
 
         // Global
@@ -309,13 +310,13 @@
         const currentDayNumber = state.currentDay ? state.currentDay.day_count : 
                                 (state.progressionStatus ? state.progressionStatus.current_day : null);
 
-        // Sort days: current day first, then past days in reverse order
+        // Sort days: current day first, then past days by date (most recent first)
         const sortedDays = [...state.days].sort((a, b) => {
             // Current day goes first
             if (a.day_count === currentDayNumber) return -1;
             if (b.day_count === currentDayNumber) return 1;
-            // Then sort remaining in descending order
-            return b.day_count - a.day_count;
+            // Then sort remaining by date in descending order (newest first)
+            return new Date(b.date) - new Date(a.date);
         });
 
         sortedDays.forEach(day => {
@@ -396,6 +397,47 @@
         }
     }
 
+    async function handleRefresh() {
+        if (!state.activeProfile) {
+            showToast('No active profile', true);
+            return;
+        }
+
+        showLoading();
+        
+        try {
+            // Step 1: Check if we can advance
+            const canAdvanceResponse = await API.canAdvance(state.activeProfile);
+            console.log('Can advance check:', canAdvanceResponse);
+
+            if (!canAdvanceResponse.can_advance) {
+                // Cannot advance - show message and stop
+                showToast(canAdvanceResponse.message || 'Cannot advance to next day yet');
+                return;
+            }
+
+            // Step 2: Can advance - create the new day
+            const advanceResponse = await API.advanceDay(state.activeProfile);
+            console.log('Advance day response:', advanceResponse);
+
+            if (advanceResponse.success) {
+                // Success! Show message and reload data
+                showToast(`Day ${canAdvanceResponse.next_day_count} created successfully!`);
+                
+                // Reload all profile data to show the new day
+                await loadProfileData(state.activeProfile);
+            } else {
+                showToast('Failed to create new day', true);
+            }
+
+        } catch (error) {
+            console.error('Refresh failed:', error);
+            showToast('Failed to refresh progress. Please try again.', true);
+        } finally {
+            hideLoading();
+        }
+    }
+
 
 
     // ============ ROUTING ============
@@ -447,6 +489,7 @@
             window.location.hash = '#/profiles';
         });
         elements.lockBtn.addEventListener('click', handleLogout);
+        elements.refreshBtn.addEventListener('click', handleRefresh);
 
         // Hash change for routing
         window.addEventListener('hashchange', handleRoute);
